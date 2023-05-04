@@ -3,10 +3,15 @@ const nextConfig = {
   experimental: {
     appDir: true,
   },
+  serverComponentsExternalPackages: ["mongoose"],
 
-  images:{
-    domains:["occ-0-3933-116.1.nflxso.net"]
-  }
-}
+  images: {
+    domains: ["occ-0-3933-116.1.nflxso.net"],
+  },
+  webpack(config) {
+    experiments = { ...config.experiments, topLevelAwait: true };
+    return config;
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
