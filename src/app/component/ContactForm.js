@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import styles from "@/app/contact/contact.module.css";
 import { Mulish } from "next/font/google";
@@ -16,12 +17,43 @@ const ContactForm = () => {
     message: "",
   });
 
+  const [status, setStatus] = useState(null);
+
   function handleChange(e) {
-      e.preventDefault();
-      const name = e.target.name;
-      const value = e.target.value;
+    e.preventDefault();
+    const name = e.target.name;
+    const value = e.target.value;
+    setUser((prevUser) => ({ ...prevUser, [name]: value }));
   }
-  function handleSubmit() {}
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        header: { Content_Type: "application/json" },
+        body: JSON.stringify({
+          username: user.username,
+          email: user.email,
+          phone: user.phone,
+          message: user.message,
+        }),
+      });
+
+      //Set status based on response from the API route
+    if (response.status === 200) {
+      setUser({
+        username: "",
+        email: "",
+        phone: "",
+        message: "",
+      });
+      setStatus("success");
+    } else {
+      setStatus("error");
+    }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <form className={styles.contact_form} onSubmit={handleSubmit}>
@@ -36,6 +68,8 @@ const ContactForm = () => {
             className={mulish.className}
             value={user.username}
             onChange={handleChange}
+            required
+            autoComplete="off"
           />
         </label>
       </div>
@@ -48,8 +82,10 @@ const ContactForm = () => {
             id="email"
             placeholder="Enter your email"
             className={mulish.className}
-            value={user.username}
+            value={user.email}
             onChange={handleChange}
+            required
+            autoComplete="off"
           />
         </label>
       </div>
@@ -62,8 +98,10 @@ const ContactForm = () => {
             id="phone"
             placeholder="Enter your phone number"
             className={mulish.className}
-            value={user.username}
+            value={user.phone}
             onChange={handleChange}
+            required
+            autoComplete="off"
           />
         </label>
       </div>
@@ -75,13 +113,17 @@ const ContactForm = () => {
             id="message"
             placeholder="Message"
             className={mulish.className}
-            value={user.username}
+            value={user.message}
             onChange={handleChange}
+            required
+            autoComplete="off"
             rows={5}
           />
         </label>
       </div>
       <div>
+        {status === 'status' && <p className={styles.success_msg}>Appreciated for your message.</p>}
+        {status === 'error' && <p className={styles.error_msg}>There is something went wrong while submitting the message.</p>}
         <button type="submit" className={mulish.className}>
           Send Message
         </button>
